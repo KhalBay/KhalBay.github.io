@@ -2,7 +2,7 @@
 import Tile from "@/components/Tile.vue";
 import {onMounted, ref} from "vue";
 import {useStore} from "@/stores";
-import type {ChunkModel} from "@/interfaces/models";
+import type {ActiveTileModel, ChunkModel} from "@/interfaces/models";
 
 interface Props {
   chunk: ChunkModel
@@ -10,16 +10,62 @@ interface Props {
 
 const props = defineProps<Props>()
 const store = useStore()
-let activeTile = ref<number>()
+let activeTile = ref<number>(0)
+let orderTileCheck = 1
+let lastOrderTileCheck = 0
+let active_tile = ref<ActiveTileModel[]>([])
 
-let active_tile = ref<any>([])
+const steper = (num: number) => {
+  if (orderTileCheck <= activeTile.value / 2) {
+    if (active_tile.value.find(el => el.id === num)) {
+      const tile = active_tile.value.find(el => el.id === num) as ActiveTileModel
+      if (tile) {
+        tile.status = 'checked'
+      }
+    }
+    if (num - 10 > 0) {
+      const tile = active_tile.value.find(el => el.id === num - 10) as ActiveTileModel
+      if (tile && !tile.order) {
+        tile.status = 'await'
+        tile.order = orderTileCheck
+        orderTileCheck++
+      }
+    }
+    if (num % 10 !== 0) {
+      const tile = active_tile.value.find(el => el.id === num +1) as ActiveTileModel
+      if (tile && !tile.order) {
+        tile.status = 'await'
+        tile.order = orderTileCheck
+        orderTileCheck++
+      }
+    }
+    if (num + 10 < 100) {
+      const tile = active_tile.value.find(el => el.id === num + 10) as ActiveTileModel
+      if (tile && !tile.order) {
+        tile.status = 'await'
+        tile.order = orderTileCheck
+        orderTileCheck++
+      }
+    }
+    if ((num - 1) % 10 !== 0) {
+      const tile = active_tile.value.find(el => el.id === num - 1) as ActiveTileModel
+      if (tile && !tile.order) {
+        tile.status = 'await'
+        tile.order = orderTileCheck
+        orderTileCheck++
+      }
+    }
+    lastOrderTileCheck++
 
-const log = () => {
-  console.log(1)
-}
-
-const active = (val:any) => {
-  active_tile.value.includes(val)
+    let nextItem = active_tile.value.find(el => el.order === lastOrderTileCheck) as ActiveTileModel
+    console.log(nextItem)
+    setTimeout(() => steper(nextItem?.id), 200)
+  } else {
+    // console.log('end', active_tile.value.filter(el => el.status === 'checked').length)
+    // active_tile.value.sort(function (a, b) {
+    //   return a.id - b.id
+    // })
+  }
 }
 
 
@@ -27,10 +73,9 @@ const render = () => {
   switch (props.chunk.type) {
     case "Start":
       activeTile.value = store.generate(25, 100)
-      active_tile.value.push(activeTile.value)
-        setTimeout(log, 2000)
-      active_tile.value.push(activeTile.value - 10, activeTile.value + 1, activeTile.value + 10, activeTile.value - 1)
       store.addEmptyItems(100, active_tile.value)
+      console.log(activeTile.value)
+      steper(activeTile.value)
       break;
     default:
       store.addEmptyItems(100, active_tile.value)
@@ -44,7 +89,7 @@ onMounted(render)
 <template>
   <div :class="{'disabled': chunk.type === 'Empty', 'start': chunk.type === 'Start', 'finish': chunk.type === 'Finish'}"
        class="chunk-wrap">
-    <Tile v-for="(n, id) in 100" class="tile" :active="active_tile.includes(n)" :id="id+1"></Tile>
+    <Tile v-for="(tile, id) in active_tile" class="tile" :active="tile.status" :id="tile.id"></Tile>
   </div>
 </template>
 

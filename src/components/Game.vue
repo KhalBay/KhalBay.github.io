@@ -41,7 +41,7 @@ onMounted(start)
     <button @click="start">relaunch</button>
 
     <div class="wrap">
-      <Chunk v-for="chunk in all_chunks" :id="chunk.id" :chunk="chunk"></Chunk>
+      <Chunk v-for="(chunk, id) in all_chunks" :id="id + 1" :chunk="chunk"></Chunk>
     </div>
   </div>
 </template>
