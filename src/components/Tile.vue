@@ -4,12 +4,11 @@ interface Props {
   tile: Object
 }
 
-const props = defineProps<Props>()
-
+defineProps<Props>()
 </script>
 
 <template>
-  <div :class="{'active': active}">
+  <div :class="{'active': active, 'await': active === 'await'}">
 
   </div>
 </template>
@@ -18,10 +17,13 @@ const props = defineProps<Props>()
 .tile {
   width: 10px;
   height: 10px;
-  background: blue;
+  background: greenyellow;
 
   &.active {
     background: darkkhaki !important;
+  }
+  &.await {
+    background: #ffed00 !important;
   }
 }
 </style>

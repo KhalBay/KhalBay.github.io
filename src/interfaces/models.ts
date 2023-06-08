@@ -1,13 +1,13 @@
-export type ChunkTypes = 'Start'|'Finish'|'Empty'|'Rooms'|'Secret'
+export type Types = 'Start'|'Finish'|'Empty'|'Rooms'|'Secret'|'Full'
 
 export interface ChunkModel {
     id: number
-    type: ChunkTypes
+    type: Types
 }
 
 export interface ActiveTileModel {
     id: number
     status: string
     order: number
-    type?:string
+    type?: Types
 }
