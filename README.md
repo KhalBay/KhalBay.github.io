@@ -16,7 +16,7 @@
 
 - I have implemented procedural generation via `Math.random()`.
 - To begin with, I determined that I need at least 7 rooms to create a full level.
-  <img src="D:\WebStorm 2022.3\proj\KhalBay.github.io\public\generate_room.gif"/>
+  <img src="public\generate_room.gif"/>
 
 other...
 
