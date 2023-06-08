@@ -16,7 +16,7 @@
 
 - I have implemented procedural generation via `Math.random()`.
 - To begin with, I determined that I need at least 7 rooms to create a full level.
-  <img src="public\procedural_level_generation.gif"/>
+  <img src="public/gifs/procedural_level_generation.gif"/>
 
 other...
 
