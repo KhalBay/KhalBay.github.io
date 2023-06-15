@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 interface Props {
-  active: String
+  status: String
   tile?: Object
 }
 
@@ -8,7 +8,7 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div :class="{'active': active, 'await': active === 'await'}">
+  <div :class="{'active': status, 'await': status === 'await', 'error': status === 'error'}">
 
   </div>
 </template>
@@ -24,6 +24,9 @@ defineProps<Props>()
   }
   &.await {
     background: #ffed00 !important;
+  }
+  &.error {
+    background: red !important;
   }
 }
 </style>

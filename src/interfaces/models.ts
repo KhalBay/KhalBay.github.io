@@ -11,3 +11,10 @@ export interface ActiveTileModel {
     order: number
     type?: Types
 }
+
+export interface ChunkAndActiveTileModel {
+    id: number
+    status?: string
+    order?: number
+    type?: Types
+}

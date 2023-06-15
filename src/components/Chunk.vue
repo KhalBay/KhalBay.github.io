@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Tile from "@/components/Tile.vue";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useStore} from "@/stores";
 import type {ActiveTileModel, ChunkModel} from "@/interfaces/models";
 
@@ -17,10 +17,17 @@ const allCheckedTile = ref<number>(1)
 const lastCheckedTileNum = ref<number>(0)
 
 const allTiles = ref<ActiveTileModel[]>([])
-const onlyActiveTiles = ref<number[]>([])
+const allActiveTiles = ref<number[]>([])
 const nextTileToCheck = ref<ActiveTileModel>(emptyActiveTileModel)
 
-const stepping = (id: number) => {
+const borderPointUp = ref<number>(0)
+const borderPointRight = ref<number[]>([])
+const borderPointDown = ref<number>(0)
+const borderPointLeft = ref<number[]>([])
+
+const onlyCheckedTiles = computed(() => allTiles.value.filter(el => el.status === 'checked'))
+
+const stepping = (id: number, withCount: boolean = true) => {
   if (allCheckedTile.value <= startWithTile.value / 2) { // Check half tiles
     checkCurrentTile(id)
     addNextTileToCheck(id)
@@ -29,56 +36,35 @@ const stepping = (id: number) => {
     nextTileToCheck.value = allTiles.value.find(el => el.order === lastCheckedTileNum.value) as ActiveTileModel
     setTimeout(() => stepping(nextTileToCheck.value.id), 50)
   } else {
-    allTiles.value.forEach((el:any) => {
-        if (el.type === 'Full') onlyActiveTiles.value.push(el.id)
-    })
+    if (withCount) countBorderPoints()
 
+    let numToNextStrochkyD = borderPointDown.value + (10 - (borderPointDown.value % 10)) // Если больше нижней границы
+    let numToNextStrochkyU = borderPointUp.value - (borderPointUp.value % 10) // Если больше Верхней границы
+    let numToNextStrochkyR = borderPointRight.value[0] % 10 === 0 ? 10 : borderPointRight.value[0] % 10
+    let numToNextStrochkyL = borderPointLeft.value[0] % 10 === 0 ? 10 : borderPointLeft.value[0] % 10
 
-    let upPoint = onlyActiveTiles.value[0],
-        downPoint = onlyActiveTiles.value[onlyActiveTiles.value.length - 1],
-        rightPoint: Number[] = [],
-        leftPoint: Number[] = []
+    let idNew = id % 10 === 0 ? 10 : id % 10
 
-    onlyActiveTiles.value.reduce((acc: number, el : number) => { // add right points
-      if (el % 10 <= acc && el % 10 !== 0) {
-        if (+rightPoint[0] % 10 > el % 10 ) rightPoint.pop()
-        acc = el % 10
-        rightPoint.push(el)
+    console.log('numToNextStrochkyD', numToNextStrochkyD)
+    console.log('numToNextStrochkyU', numToNextStrochkyU)
+    console.log('numToNextStrochkyR', numToNextStrochkyR)
+    console.log('numToNextStrochkyL', numToNextStrochkyL)
+
+    if (id > numToNextStrochkyD || id < numToNextStrochkyU || idNew < numToNextStrochkyR || idNew > numToNextStrochkyL) {
+      // alert(id)
+      const tile = allTiles.value.find(el => el.id === id) as ActiveTileModel
+      if (tile) {
+        tile.status = 'error'
+        tile.type = 'Full'
       }
-      if (rightPoint.length > 1 && +rightPoint[0] % 10 !== +rightPoint[1] % 10) rightPoint.shift()
-      return acc
-    }, 9)
+    } else {
+      checkCurrentTile(id)
+      addNextTileToCheck(id)
+    }
 
-    onlyActiveTiles.value.reduce((acc: number, el : number) => { // add left points
-      if (el % 10 === 0) {
-        if (+leftPoint[0] % 10 !== 0) leftPoint = []
-        leftPoint.push(el)
-      }
-      if (el % 10 >= acc && +leftPoint[0] % 10 !== 0) {
-        if (+leftPoint[0] % 10 < el % 10 ) leftPoint.pop()
-        acc = el % 10
-        leftPoint.push(el)
-      }
-      if (leftPoint.length > 1 && +leftPoint[0] % 10 !== +leftPoint[1] % 10) leftPoint.shift()
-      return acc
-    }, 0)
-
-
-
-    // if (num < upPoint + 10) { // Если больше вехней границы
-    //   const tile = allTiles.value.find(el => el.id === num) as ActiveTileModel
-    //   if (tile) {
-    //     tile.status = 'checked'
-    //     tile.type = 'Full'
-    //   }
-    // }
-    // lastCheckedTileNum++
-    console.log('onlyActiveTiles', onlyActiveTiles.value);
-
-    console.log('upPoint', upPoint)
-    console.log('downPoint', downPoint)
-    console.log('rightPoint', rightPoint)
-    console.log('leftPoint', leftPoint)
+    lastCheckedTileNum.value++
+    nextTileToCheck.value = allTiles.value.find(el => el.order === lastCheckedTileNum.value) as ActiveTileModel
+    if (onlyCheckedTiles.value.length <= startWithTile.value) setTimeout(() => stepping(nextTileToCheck.value.id, false), 50)
   }
 }
 
@@ -118,17 +104,58 @@ const addNextTileToCheck = (id: number) => {
   }
 }
 
+const countBorderPoints = () => {
+  allTiles.value.forEach((el:any) => {
+    if (el.type === 'Full') allActiveTiles.value.push(el.id)
+  })
+
+  borderPointUp.value = allActiveTiles.value[0]
+  borderPointDown.value = allActiveTiles.value[allActiveTiles.value.length - 1]
+
+
+  //Нужен ли массив если я использую через [0]??
+  allActiveTiles.value.reduce((acc: number, el : number) => { // add right points
+    if (el % 10 <= acc && el % 10 !== 0) {
+      if (+borderPointRight.value[0] % 10 > el % 10 ) borderPointRight.value.pop()
+      acc = el % 10
+      borderPointRight.value.push(el)
+    }
+    if (borderPointRight.value.length > 1 && +borderPointRight.value[0] % 10 !== +borderPointRight.value[1] % 10) borderPointRight.value.shift()
+    return acc
+  }, 9)
+
+  //Нужен ли массив если я использую через [0]??
+  allActiveTiles.value.reduce((acc: number, el : number) => { // add left points
+    if (el % 10 === 0) {
+      if (+borderPointLeft.value[0] % 10 !== 0) borderPointLeft.value = []
+      borderPointLeft.value.push(el)
+    }
+    if (el % 10 >= acc && +borderPointLeft.value[0] % 10 !== 0) {
+      if (+borderPointLeft.value[0] % 10 < el % 10 ) borderPointLeft.value.pop()
+      acc = el % 10
+      borderPointLeft.value.push(el)
+    }
+    if (borderPointLeft.value.length > 1 && +borderPointLeft.value[0] % 10 !== +borderPointLeft.value[1] % 10) borderPointLeft.value.shift()
+    return acc
+  }, 0)
+}
+
 
 const render = () => {
   switch (props.chunk.type) {
     case "Start":
-      startWithTile.value = store.generate(37, 37)
+      // startWithTile.value = store.generate(37, 37)
       // startWithTile.value = store.generate(39, 39)
-      // startWithTile.value = store.generate(77, 77)
-      // startWithTile.value = store.generate(67, 67)
-      // startWithTile.value = store.generate(88, 88)
-      // startWithTile.value = store.generate(100, 100)
-      // startWithTile.value = store.generate(25, 100)
+      // startWithTile.value = store.generate(77, 77) // problem
+      // startWithTile.value = store.generate(67, 67) //too
+      // startWithTile.value = store.generate(88, 88) //too
+      // startWithTile.value = store.generate(100, 100) //too
+      // startWithTile.value = store.generate(91, 91)
+      // startWithTile.value = store.generate(61, 61)
+      // startWithTile.value = store.generate(25, 25)
+      // startWithTile.value = store.generate(31, 31)
+      // startWithTile.value = store.generate(16, 16)
+      startWithTile.value = store.generate(25, 100)
       store.addEmptyItems(100, allTiles.value)
       console.log('start with:', startWithTile.value)
       stepping(startWithTile.value)
@@ -143,9 +170,11 @@ onMounted(render)
 </script>
 
 <template>
-  <div :class="{'disabled': chunk.type === 'Empty', 'start': chunk.type === 'Start', 'finish': chunk.type === 'Finish'}"
-       class="chunk-wrap">
-    <Tile v-for="tile in allTiles" class="tile" :active="tile.status" :id="tile.id"></Tile>
+  <div
+      :class="{'disabled': chunk.type === 'Empty', 'start': chunk.type === 'Start', 'finish': chunk.type === 'Finish'}"
+      class="chunk-wrap"
+  >
+    <Tile v-for="tile in allTiles" class="tile" :status="tile.status" :id="tile.id"></Tile>
   </div>
 </template>
 

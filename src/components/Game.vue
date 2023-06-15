@@ -37,8 +37,8 @@ onMounted(start)
 
 <template>
   <div>
-    <h1>{{ active_chunks }}</h1>
-    <button @click="start">relaunch</button>
+<!--    <h1>{{ active_chunks }}</h1>-->
+<!--    <button @click="start">relaunch</button>-->
 
     <div class="wrap">
       <Chunk v-for="(chunk, id) in allChunks" :id="id + 1" :chunk="chunk"></Chunk>
