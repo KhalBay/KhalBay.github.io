@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import type {ActiveTileModel, ChunkModel} from "@/interfaces/models";
+import type {ActiveTileModel, ChunkAndActiveTileModel, ChunkModel} from "@/interfaces/models";
 
 export const useStore = defineStore('store', () => {
     const generate = (to: number, from: number) => {
@@ -10,11 +10,9 @@ export const useStore = defineStore('store', () => {
         return arr.sort(() => Math.random() - 0.5);
     }
 
-    const addEmptyItems = (max: number, arr: ChunkModel[] | ActiveTileModel[]) => {
+    const addEmptyItems = (max: number, arr: ChunkAndActiveTileModel[]) => {
         for (let i: number = 1; i <= max; i++) {
-            // @ts-ignore
-            if (!arr.find((el: ActiveTileModel | ChunkModel) => el.id === i)) {
-                // @ts-ignore
+            if (!arr.find((el: ChunkAndActiveTileModel) => el.id === i)) {
                 arr.push({"id": i, "type": 'Empty'})
             }
         }
