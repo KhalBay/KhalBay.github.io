@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import Game from "@/components/Game.vue";
+import GameDungeon from "@/components/GameDungeon.vue";
+import Game from "@/components/2048/GameNumbers.vue";
 import {ref} from "vue";
 
 const gameActive = ref<boolean>(true)
@@ -12,7 +13,9 @@ const relaunchGame = () => {
 
 <template>
   <main>
-    <button @click="relaunchGame">relaunch</button>
-    <game v-if="gameActive"/>
+    <button @click="relaunchGame">
+      relaunch
+    </button>
+    <game v-if="gameActive" />
   </main>
 </template>

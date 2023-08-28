@@ -47,11 +47,5 @@ onMounted(start)
 </template>
 
 <style scoped lang="scss">
-.wrap {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 5px;
-}
 </style>
 
