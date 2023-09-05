@@ -15,3 +15,26 @@
   gap: 5px;
 }
 
+$tiles-value:
+  2 #fff6a7 #a5a5a5,
+  4 #e2ffa7 #a5a5a5,
+  8 #a7ffd7 #a5a5a5,
+  16 #ffec54 #a5a5a5,
+  32 #6bff54 #a5a5a5,
+  64 #54ffd1 #a5a5a5,
+  128 #59b9ff #FFFFFF,
+  256 #ba80ff #FFFFFF,
+  512 #ff7133 #FFFFFF,
+  1024 #a000ff #FFFFFF,
+  2048 #f700ff #FFFFFF,
+  4096 #ff0000 #FFFFFF,
+  8192 #ff9900 #FFFFFF,
+  16384 #ddff00 #FFFFFF;
+
+@each $class, $bg-color, $color  in $tiles-value {
+  .tile.tile-#{$class} {
+    background-color: $bg-color;
+    color: $color;
+  }
+}
+

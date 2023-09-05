@@ -5,7 +5,7 @@ describe('HelloWorld.vue', () => {
     test('отрисовывает props.msg, если они переданы', () => {
         const msg = 'new message'
         const wrapper = shallowMount(TileNumbers, {
-            propsData: { msg }
+            propsData: 'test'
         })
         expect(wrapper.text()).toMatch(msg)
     })
