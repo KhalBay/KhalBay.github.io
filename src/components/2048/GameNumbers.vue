@@ -39,7 +39,7 @@ const addNewNumber = () => {
 }
 
 const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel) => {
-  let prevTile: TileNumbersModel
+  let prevTile: TileNumbersModel | undefined
   let prevPosition: number
   switch (way) {
     case 'up':
@@ -49,13 +49,13 @@ const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel) => {
         break
       }
       prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile.num === element.num && !prevTile.isSum) {
+      if (prevTile?.num === element.num && !prevTile.isSum) {
         prevTile.num *= 2
         prevTile.isSum = true
         element.num = 0
         break
       }
-      if (!prevTile.num) {
+      if (!prevTile?.num && prevTile) {
         prevTile.num = element.num
         element.num = 0
         checkConditionsAndMove('up', prevTile)
@@ -68,13 +68,13 @@ const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel) => {
         break
       }
       prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile.num === element.num && !prevTile.isSum) {
+      if (prevTile?.num === element.num && !prevTile.isSum) {
         prevTile.num *= 2
         prevTile.isSum = true
         element.num = 0
         break
       }
-      if (!prevTile.num) {
+      if (!prevTile?.num && prevTile) {
         prevTile.num = element.num
         element.num = 0
         checkConditionsAndMove('down', prevTile)
@@ -87,13 +87,13 @@ const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel) => {
         break
       }
       prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile.num === element.num && !prevTile.isSum) {
+      if (prevTile?.num === element.num && !prevTile.isSum) {
         prevTile.num *= 2
         prevTile.isSum = true
         element.num = 0
         break
       }
-      if (!prevTile.num) {
+      if (!prevTile?.num && prevTile) {
         prevTile.num = element.num
         element.num = 0
         checkConditionsAndMove('left', prevTile)
@@ -106,13 +106,13 @@ const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel) => {
         break
       }
       prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile.num === element.num && !prevTile.isSum) {
+      if (prevTile?.num === element.num && !prevTile.isSum) {
         prevTile.num *= 2
         prevTile.isSum = true
         element.num = 0
         break
       }
-      if (!prevTile.num) {
+      if (!prevTile?.num && prevTile) {
         prevTile.num = element.num
         element.num = 0
         checkConditionsAndMove('right', prevTile)
