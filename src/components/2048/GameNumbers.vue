@@ -338,16 +338,6 @@ onMounted(() => {
     display: flex;
     gap: 20px;
 
-    .button-relaunch {
-      background: #c9c9c9;
-      padding: 0 20px;
-      border-radius: 2px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-
     &-item {
       background: #c9c9c9;
       padding: 0 20px;
@@ -361,6 +351,15 @@ onMounted(() => {
         font-weight: 700;
       }
     }
+  }
+  .button-relaunch {
+    background: #c9c9c9;
+    padding: 0 20px;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
   }
 }
 </style>
