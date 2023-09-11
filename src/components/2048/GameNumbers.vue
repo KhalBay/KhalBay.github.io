@@ -30,7 +30,8 @@ const getRandomNumber = (min: number, max: number, count: number = 1): number[] 
 }
 
 const createTiles = () => {
-  const twoRandomTile: number[] = getRandomNumber(0, 16, 12)
+  const twoRandomTile: number[] = getRandomNumber(0, 16, 2)
+  if (twoRandomTile[0] === twoRandomTile[1]) twoRandomTile[1]++
   for (let i: number = 0; i < 16; i++) {
     allTile.value.push({
       id: i,
@@ -146,7 +147,7 @@ const moveUp = () => {
   allTile.value.forEach((el: TileNumbersModel) => {
     if (el.num && el.position > 20) checkConditionsAndMove('up', el)
   })
-  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value)) {
+  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value) && freedomTile.value) {
     setTimeout(addNewNumber, 50)
   }
 }
@@ -159,7 +160,7 @@ const moveDown = () => {
     if (el.num && el.position < 40) checkConditionsAndMove('down', el)
   })
   allTile.value = allTile.value.sort((a, b) => a.id - b.id)
-  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value)) {
+  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value) && freedomTile.value) {
     setTimeout(addNewNumber, 50)
   }
 }
@@ -172,7 +173,7 @@ const moveLeft = () => {
     if (el.num && el.position % 10 !== 1) checkConditionsAndMove('left', el)
   })
   allTile.value = allTile.value.sort((a, b) => a.id - b.id)
-  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value)) {
+  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value) && freedomTile.value) {
     setTimeout(addNewNumber, 50)
   }
 }
@@ -185,7 +186,7 @@ const moveRight = () => {
     if (el.num && el.position % 10 !== 4) checkConditionsAndMove('right', el)
   })
   allTile.value = allTile.value.sort((a, b) => a.id - b.id)
-  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value)) {
+  if (JSON.stringify(lastClone.value) !== JSON.stringify(allTile.value) && freedomTile.value) {
     setTimeout(addNewNumber, 50)
   }
 }
@@ -193,10 +194,12 @@ const moveRight = () => {
 const checkLoseConditions = () => {
   const tilesForCheck = allTile.value.filter((el: TileNumbersModel) => [1,3,4,6,9,11,12,14].includes(el.id))
   const isSum = tilesForCheck.map((el: TileNumbersModel) => checkSumWithNeighbor(el))
-  if (isSum.every((el: boolean) => !el) && !freedomTile.value) gameOver.value = true
-  if (bestScore.value < score.value) {
-    localStorage.setItem('bestScore2048', score.value.toString())
-    bestScore.value = score.value
+  if (isSum.every((el: boolean) => !el) && !freedomTile.value) {
+    gameOver.value = true
+    if (bestScore.value < score.value) {
+      localStorage.setItem('bestScore2048', score.value.toString())
+      bestScore.value = score.value
+    }
   }
 }
 
@@ -209,6 +212,7 @@ const checkSumWithNeighbor = (element: TileNumbersModel): boolean => {
 }
 
 const relaunchGame = () => {
+  animationType.value = 'create'
   allTile.value = []
   score.value = 0
   gameOver.value = false
@@ -260,14 +264,14 @@ onMounted(() => {
     </div>
   </div>
   <div
+    class="wrap"
+    :class="{'game-over': gameOver, 'game-win': winClass}"
+    tabindex="0"
     ref="tileWrapper"
     v-touch:swipe.top="moveUp"
     v-touch:swipe.bottom="moveDown"
     v-touch:swipe.left="moveLeft"
     v-touch:swipe.right="moveRight"
-    class="wrap"
-    :class="{'game-over': gameOver, 'game-win': winClass}"
-    tabindex="0"
     @keyup.up="moveUp"
     @keyup.down="moveDown"
     @keyup.left="moveLeft"
@@ -289,6 +293,7 @@ onMounted(() => {
   padding: 15px;
   border-radius: 8px;
   outline: none;
+  user-select: none;
 }
 
 .game-over {
@@ -333,6 +338,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   margin: 0 0 20px 0;
+  user-select: none;
 
   .count-result {
     display: flex;
@@ -360,6 +366,15 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+  }
+}
+
+@media (max-width: 510px) {
+  .game-over::before {
+    font-size: 38px;
+  }
+  .game-win::before {
+    font-size: 38px;
   }
 }
 </style>
