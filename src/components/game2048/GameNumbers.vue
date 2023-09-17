@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, onMounted, ref, watch} from "vue"
 import type {Keyup, TileNumbersModel} from "@/interfaces/models"
-import Tile from "@/components/2048/TileNumbers.vue"
+import Tile from "@/components/game2048/TileNumbers.vue"
 
 const tileWrapper = ref()
 const allTile = ref<TileNumbersModel[]>([])
@@ -15,7 +15,7 @@ const winClass = ref(false)
 const winTile = computed(() => allTile.value.some((el: TileNumbersModel) => el.num >= 2048))
 const freedomTile = computed(() => allTile.value.some((el: TileNumbersModel) => el.num === 0))
 
-const checkLS = () => {
+const checkLS = () => { // Check local Storage
   if (localStorage.getItem('bestScore2048')) {
     bestScore.value = Number(localStorage.getItem('bestScore2048'))
   }
@@ -53,89 +53,57 @@ const addNewNumber = () => {
   })
 }
 
+const addingTiles = (prevTile: TileNumbersModel, element: TileNumbersModel) => {
+  prevTile.num *= 2
+  score.value += prevTile.num
+  prevTile.isSum = true
+  element.num = 0
+}
+
+const replaceTileAndRepeat = (way: Keyup, prevTile: TileNumbersModel, element: TileNumbersModel) => {
+  prevTile.num = element.num
+  element.num = 0
+  checkConditionsAndMove(way, prevTile)
+}
+
 const checkConditionsAndMove = (way: Keyup, element: TileNumbersModel): void => {
   let prevTile: TileNumbersModel | undefined
-  let prevPosition: number
   switch (way) {
     case 'up':
-      if (element.position > 20) {
-        prevPosition = element.position - 10
-      } else {
+      if (element.position < 20) break // Stop if the tile is on the border
+      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === (element.position - 10))
+      if (prevTile?.num === element.num && !prevTile.isSum) { // Addition the tiles
+        addingTiles(prevTile, element)
         break
       }
-      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile?.num === element.num && !prevTile.isSum) {
-        prevTile.num *= 2
-        score.value += prevTile.num
-        prevTile.isSum = true
-        element.num = 0
-        break
-      }
-      if (!prevTile?.num && prevTile) {
-        prevTile.num = element.num
-        element.num = 0
-        checkConditionsAndMove('up', prevTile)
-      }
+      if (!prevTile?.num && prevTile) replaceTileAndRepeat('up', prevTile, element) // Movement and recursion
       break
     case 'down':
-      if (element.position < 40) {
-        prevPosition = element.position + 10
-      } else {
+      if (element.position > 40) break // Stop if the tile is on the border
+      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === (element.position + 10))
+      if (prevTile?.num === element.num && !prevTile.isSum) { // Addition the tiles
+        addingTiles(prevTile, element)
         break
       }
-      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile?.num === element.num && !prevTile.isSum) {
-        prevTile.num *= 2
-        score.value += prevTile.num
-        prevTile.isSum = true
-        element.num = 0
-        break
-      }
-      if (!prevTile?.num && prevTile) {
-        prevTile.num = element.num
-        element.num = 0
-        checkConditionsAndMove('down', prevTile)
-      }
+      if (!prevTile?.num && prevTile) replaceTileAndRepeat('down', prevTile, element) // Movement and recursion
       break
     case 'left':
-      if (element.position % 10 !== 1) {
-        prevPosition = element.position - 1
-      } else {
+      if (element.position % 10 === 1) break // Stop if the tile is on the border
+      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === (element.position - 1))
+      if (prevTile?.num === element.num && !prevTile.isSum) { // Addition the tiles
+        addingTiles(prevTile, element)
         break
       }
-      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile?.num === element.num && !prevTile.isSum) {
-        prevTile.num *= 2
-        score.value += prevTile.num
-        prevTile.isSum = true
-        element.num = 0
-        break
-      }
-      if (!prevTile?.num && prevTile) {
-        prevTile.num = element.num
-        element.num = 0
-        checkConditionsAndMove('left', prevTile)
-      }
+      if (!prevTile?.num && prevTile) replaceTileAndRepeat('left', prevTile, element) // Movement and recursion
       break
     case 'right':
-      if (element.position % 10 !== 4) {
-        prevPosition = element.position + 1
-      } else {
+      if (element.position % 10 === 4) break // Stop if the tile is on the border
+      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === (element.position + 1))
+      if (prevTile?.num === element.num && !prevTile.isSum) { // Addition the tiles
+        addingTiles(prevTile, element)
         break
       }
-      prevTile = allTile.value.find((item: TileNumbersModel) => item.position === prevPosition)
-      if (prevTile?.num === element.num && !prevTile.isSum) {
-        prevTile.num *= 2
-        score.value += prevTile.num
-        prevTile.isSum = true
-        element.num = 0
-        break
-      }
-      if (!prevTile?.num && prevTile) {
-        prevTile.num = element.num
-        element.num = 0
-        checkConditionsAndMove('right', prevTile)
-      }
+      if (!prevTile?.num && prevTile) replaceTileAndRepeat('right', prevTile, element) // Movement and recursion
       break
   }
 }
@@ -264,14 +232,14 @@ onMounted(() => {
     </div>
   </div>
   <div
-    class="wrap"
-    :class="{'game-over': gameOver, 'game-win': winClass}"
-    tabindex="0"
     ref="tileWrapper"
     v-touch:swipe.top="moveUp"
     v-touch:swipe.bottom="moveDown"
     v-touch:swipe.left="moveLeft"
     v-touch:swipe.right="moveRight"
+    class="wrap"
+    :class="{'game-over': gameOver, 'game-win': winClass}"
+    tabindex="0"
     @keyup.up="moveUp"
     @keyup.down="moveDown"
     @keyup.left="moveLeft"
@@ -370,6 +338,11 @@ onMounted(() => {
 }
 
 @media (max-width: 510px) {
+  .wrap {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
   .game-over::before {
     font-size: 38px;
   }

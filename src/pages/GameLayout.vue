@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import GameDungeon from "@/components/GameDungeon.vue";
+import GameDungeon from "@/components/gameDungeon/GameDungeon.vue";
 import {ref} from "vue";
-import GameNumbers from "@/components/2048/GameNumbers.vue";
+import GameNumbers from "@/components/game2048/GameNumbers.vue";
 
 // const gameActive = ref<boolean>(true)
 

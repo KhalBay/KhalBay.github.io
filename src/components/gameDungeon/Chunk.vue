@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Tile from "@/components/Tile.vue";
+import Tile from "@/components/gameDungeon/Tile.vue";
 import {computed, onMounted, ref} from "vue";
 import {useStore} from "@/stores";
 import type {ActiveTileModel, ChunkModel} from "@/interfaces/models";
@@ -171,10 +171,15 @@ onMounted(render)
 
 <template>
   <div
-      :class="{'disabled': chunk.type === 'Empty', 'start': chunk.type === 'Start', 'finish': chunk.type === 'Finish'}"
-      class="chunk-wrap"
+    :class="{'disabled': chunk.type === 'Empty', 'start': chunk.type === 'Start', 'finish': chunk.type === 'Finish'}"
+    class="chunk-wrap"
   >
-    <Tile v-for="tile in allTiles" class="tile" :status="tile.status" :id="tile.id"></Tile>
+    <Tile
+      v-for="tile in allTiles"
+      :id="tile.id"
+      class="tile"
+      :status="tile.status"
+    />
   </div>
 </template>
 
