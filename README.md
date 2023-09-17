@@ -6,7 +6,22 @@ Vue 3
 TypeScript
 Linter
 ````
-### Enjoy and win
+### Enjoy and win 🥇 I believe in you!
+
+## How is the game made?
+All logic is in the game2048 folder. And here there are only 2 vue files.
+````
+--components
+  ∟ game2048 // The whole game is here
+  ∟ gameDungeon // This game is under development
+````
+The main file is **GameNumbers.vue**. It contains all the logic from building 
+a grid to moving or adding tiles. I also use v-for and the **TileNumbers.vue** 
+component to display each cell. And I am using different classes to display the 
+cell color.
+
+
+
 
 [//]: # (## How the game was created:)
 
